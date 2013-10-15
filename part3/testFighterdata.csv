@@ -1,0 +1,13 @@
+source,target,win
+GSP,Nick Diaz,1
+GSP,Josh Koscheck,1
+GSP,Thiago Alves,1
+GSP,Dan Hardy,1
+Josh Koscheck,GSP,-1
+Nick Diaz,GSP,-1
+Thiago Alves,GSP,-1
+Dan Hardy,GSP,-1
+Nick Diaz,Robbie Lawler,1
+Nick Diaz,Gomi,1
+Gomi,Nick Diaz,-1
+Robbie Lawler,Nick Diaz,-1

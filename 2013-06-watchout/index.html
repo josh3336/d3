@@ -1,0 +1,172 @@
+<!doctype html>
+
+<html>
+<head>
+  <meta charset="utf-8">
+  <title></title>
+<link rel="stylesheet" href="style.css"></style>
+</head>
+
+<body>
+
+
+<div class="topbox">
+  <div class="scoreboard">
+      <p>High Score: <span id="highscore">0</span></p>
+      <p>Current Score:<span id="score">0</span></p>
+  </div>
+</div>
+<div class="canvas"></div>
+
+<script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.2/jquery.min.js" charset="utf-8"></script>
+<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+
+<script src="http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.4.4/underscore-min.js"></script>
+<script type="text/javascript">
+
+
+//d3.select("body").append("p").text("New paragraph!");
+var Score = 0;
+var Highscore=0;
+
+var dataset = [ 5, 10, 15, 20, 25,100,35,33 ];
+var h = 600;
+var w = 1000;
+
+
+var enemyarray = _.range(0,20);
+//var svg = d3.select("body").append("svg");
+
+var svg = d3
+  .select("div.canvas")
+  .append("svg")
+  .attr("width", w)
+  .attr("height", h);
+
+
+var enemies = svg
+  .selectAll("circle")
+  .data(enemyarray)
+  .enter()
+  .append("circle")
+  .attr("class", "enemy")
+  .style("fill", "white")
+
+
+enemies
+  .attr("cx", function() {
+    return Math.floor(Math.random() * w)
+  })
+  .attr("cy", function() {
+    return Math.floor(Math.random() * h)
+  })
+  .attr("r", function(d) {
+      return d;
+  });
+
+
+
+var player = svg
+  .append('circle')
+  .attr('r',20)
+  .attr('class','player')
+  .attr("cx",250)
+  .attr("cy",250)
+  .style("fill", "red")
+  .style("stroke","white")
+  .style("stroke-width",5)
+  // .call(d3.behavior.drag()
+  //   .on("drag", function() { MoveObject.apply(this)}));
+
+player.call(d3.behavior.drag()
+ .on("drag", function(d) {
+  MoveObject.call(this)
+}));
+
+
+  // circle.call(d3.behavior.drag()
+  //   .on("drag", function(d) { console.log(d),MoveObject.apply(this)}));
+
+var MoveObject = function (){
+    var x = +d3.select(this).attr("cx");
+    var y = +d3.select(this).attr("cy");
+    console.log(x,y)
+    var radius = parseFloat(d3.select(this).attr("r"));
+    if (( x+d3.event.dx >= radius) && (x+d3.event.dx < w-radius)){
+      x += d3.event.dx;
+      d3.select(this).attr("cx",x);
+    }
+    if( (y+d3.event.dy > radius) && (y + d3.event.dy < h-radius)){
+      y += d3.event.dy;
+      d3.select(this).attr("cy",y);
+    }
+};
+
+var checkCollision = function() {
+  // console.log('in checkCollision');
+  // console.log(this)
+  var sumRadii = parseFloat(d3.select(this).attr("r")) + parseFloat(player.attr("r"));
+  var xDiff = parseFloat(d3.select(this).attr("cx")) - parseFloat(player.attr("cx"));
+  var yDiff = parseFloat(d3.select(this).attr("cy")) - parseFloat(player.attr("cy"));
+  var diagonal = Math.sqrt( (xDiff*xDiff) + (yDiff*yDiff) );
+  //console.log("radii sum",sumRadii,"xDiff",xDiff,"yDiff",yDiff,"diagonal",diagonal)
+
+  if(diagonal <= sumRadii) {
+    console.warn('collision!');
+    if (Score > Highscore){
+      Highscore=Score
+    }
+    Score=0
+  }
+};
+
+var tweenCheck = function () {
+  return function(t){
+    checkCollision.apply(this)
+  };
+};
+
+var enemiesMove = function(){
+  enemies
+    .style('fill', 'white')
+    .transition()
+    .duration(1000)
+    .tween('custom', tweenCheck)
+    .ease('bounce')
+    .delay(1000)
+    .style('fill', 'cyan')
+    .style('opacity', 1)
+    .attr('cy', function() {
+      return Math.floor(Math.random() * h);
+    })
+    .attr('cx', function() {
+      return Math.floor(Math.random() * w);
+    })
+    .transition()
+
+      
+};
+
+setInterval(function() {
+  enemiesMove();
+}, 2000);
+
+setTimeout(function(){setInterval(function() {
+    ScoreStart();
+  }, 100);
+},3000)
+
+
+var ScoreStart =  function(){
+  Score++
+  document.getElementById('score').innerHTML = Score;
+  document.getElementById('highscore').innerHTML = Highscore;
+  }
+
+
+
+
+
+</script>
+</body>
+</html>
